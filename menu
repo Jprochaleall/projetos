@@ -1,0 +1,131 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_CLIENTES 100
+#define TAM_NOME 50
+
+// Estrutura para armazenar dados do cliente
+typedef struct {
+    char nome[TAM_NOME];
+    int idade;
+} Cliente;
+
+// Função para exibir o menu
+void exibirMenu() {
+    printf("\n--- Menu ---\n");
+    printf("1. Cadastro\n");
+    printf("2. Consulta\n");
+    printf("3. Gerar Relatório\n");
+    printf("4. Excluir\n");
+    printf("5. Sair\n");
+    printf("Escolha uma opção: ");
+}
+
+// Função para cadastrar um cliente
+void cadastrarCliente(Cliente clientes[], int *qtdClientes) {
+    if (*qtdClientes >= MAX_CLIENTES) {
+        printf("Erro: Número máximo de clientes atingido.\n");
+        return;
+    }
+    
+    Cliente novoCliente;
+    printf("Digite o nome do cliente: ");
+    getchar();  // Limpa o buffer
+    fgets(novoCliente.nome, TAM_NOME, stdin);
+    novoCliente.nome[strcspn(novoCliente.nome, "\n")] = 0;  // Remove o '\n' do final
+    printf("Digite a idade do cliente: ");
+    scanf("%d", &novoCliente.idade);
+    
+    clientes[*qtdClientes] = novoCliente;
+    (*qtdClientes)++;
+    printf("Cliente cadastrado com sucesso!\n");
+}
+
+// Função para consultar um cliente
+void consultarCliente(Cliente clientes[], int qtdClientes) {
+    char nomeBusca[TAM_NOME];
+    printf("Digite o nome do cliente para consulta: ");
+    getchar();  // Limpa o buffer
+    fgets(nomeBusca, TAM_NOME, stdin);
+    nomeBusca[strcspn(nomeBusca, "\n")] = 0;  // Remove o '\n' do final
+    
+    for (int i = 0; i < qtdClientes; i++) {
+        if (strcmp(clientes[i].nome, nomeBusca) == 0) {
+            printf("Cliente encontrado: %s, Idade: %d\n", clientes[i].nome, clientes[i].idade);
+            return;
+        }
+    }
+    
+    printf("Cliente não encontrado.\n");
+}
+
+// Função para gerar o relatório de clientes
+void gerarRelatorio(Cliente clientes[], int qtdClientes) {
+    if (qtdClientes == 0) {
+        printf("Nenhum cliente cadastrado.\n");
+        return;
+    }
+    
+    printf("\n--- Relatório de Clientes ---\n");
+    for (int i = 0; i < qtdClientes; i++) {
+        printf("Cliente: %s, Idade: %d\n", clientes[i].nome, clientes[i].idade);
+    }
+}
+
+// Função para excluir um cliente
+void excluirCliente(Cliente clientes[], int *qtdClientes) {
+    char nomeExcluir[TAM_NOME];
+    printf("Digite o nome do cliente para excluir: ");
+    getchar();  // Limpa o buffer
+    fgets(nomeExcluir, TAM_NOME, stdin);
+    nomeExcluir[strcspn(nomeExcluir, "\n")] = 0;  // Remove o '\n' do final
+    
+    int i;
+    for (i = 0; i < *qtdClientes; i++) {
+        if (strcmp(clientes[i].nome, nomeExcluir) == 0) {
+            // Move todos os clientes após o excluído para a posição anterior
+            for (int j = i; j < (*qtdClientes) - 1; j++) {
+                clientes[j] = clientes[j + 1];
+            }
+            (*qtdClientes)--;  // Reduz o número de clientes
+            printf("Cliente excluído com sucesso!\n");
+            return;
+        }
+    }
+    
+    printf("Cliente não encontrado.\n");
+}
+
+// Função principal
+int main() {
+    Cliente clientes[MAX_CLIENTES];
+    int qtdClientes = 0;
+    int opcao;
+    
+    do {
+        exibirMenu();
+        scanf("%d", &opcao);
+        
+        switch (opcao) {
+            case 1:
+                cadastrarCliente(clientes, &qtdClientes);
+                break;
+            case 2:
+                consultarCliente(clientes, qtdClientes);
+                break;
+            case 3:
+                gerarRelatorio(clientes, qtdClientes);
+                break;
+            case 4:
+                excluirCliente(clientes, &qtdClientes);
+                break;
+            case 5:
+                printf("Saindo do sistema...\n");
+                break;
+            default:
+                printf("Opção inválida. Tente novamente.\n");
+        }
+    } while (opcao != 5);
+    
+    return 0;
+}
